@@ -57,7 +57,7 @@ In the upper right corner of your window, click on 'Screen Options' and make sur
 
 == Changelog ==
 
-= 0.5.6
+= 0.5.6 =
 * Registering the metabox with the list of regions later in the hopes of catching any regions defined in the wrong hook
 * Eliminating an E_NOTICE-level error during output of $output being undefined
 
