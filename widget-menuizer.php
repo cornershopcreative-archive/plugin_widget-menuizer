@@ -10,14 +10,33 @@ License: GPLv2 or later
 Text Domain: widget-menuizer
 */
 
+define( 'CSHP_WM_PATH', plugin_dir_path( __FILE__ ) );
 /**
  * Add our tiny bit of CSS
  */
-function menuizer_admin_styles() {
+function menuizer_admin_styles( $hook ) {
+	//register scripts and styles
 	wp_register_style( 'menuizer_stylesheet', plugins_url( '/widget-menuizer.css', __FILE__ ) );
-	wp_enqueue_style( 'menuizer_stylesheet' );
+	wp_register_style( 'cshp-wm-sidabar', plugins_url( '/assets/css/sidebars.css', __FILE__ ) );
+	wp_register_script( 'cshp-wm-sidabar', plugins_url( '/assets/js/sidebars.js', __FILE__ ), array( 'jquery' ) );
+	
+	//Add scriopts and style on the needed admin screen
+	switch ( $hook ) :
+		case 'widgets.php':
+			wp_enqueue_script( 'cshp-wm-sidabar' );
+			wp_localize_script( 'cshp-wm-sidabar', 'cshp_wm_sidebars_options', array(
+				'ajaxurl'		=> admin_url( 'admin-ajax.php' ),
+				'cshp_wm_sidebars_nonce'	=> wp_create_nonce( 'cshp_wm_sidebars_nonce' ),
+			) );
+
+			wp_enqueue_style( 'cshp-wm-sidabar' );
+			break;
+		case 'nav-menus.php':
+			wp_enqueue_style( 'menuizer_stylesheet' );
+			break;
+	endswitch;
 }
-add_action( 'admin_enqueue_scripts', 'menuizer_admin_styles' );
+add_action( 'admin_enqueue_scripts', 'menuizer_admin_styles', 10, 1 );
 
 /**
  * Generate a metabox for the sidebars item.
@@ -449,3 +468,5 @@ function menuizer_nav_menu_start_el( $item_output, $item, $depth, $args ) {
 	return $item_output;
 }
 add_filter( 'walker_nav_menu_start_el', 'menuizer_nav_menu_start_el', 99, 4 );
+
+require_once( CSHP_WM_PATH . '/inc/sidebars.php' );
