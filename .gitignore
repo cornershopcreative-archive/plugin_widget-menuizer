@@ -1,0 +1,24 @@
+# Build Tools
+.sass-cache
+node_modules/
+jspm_packages/
+
+## OS ##
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Mac OS X
+.DS_Store
+__MACOSX
+
+## Software ##
+
+# Dreamweaver
+_notes
+dwsync.xml
+dw_php_codehinting.config
+
+# PHP Storm
+.idea/
