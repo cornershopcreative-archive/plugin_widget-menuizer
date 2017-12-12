@@ -20,7 +20,7 @@ function menuizer_admin_styles( $hook ) {
 	wp_register_style( 'menuizer_stylesheet', plugins_url( '/widget-menuizer.css', __FILE__ ) );
 	wp_register_style( 'cshp-wm-sidabar', plugins_url( '/assets/css/sidebars.css', __FILE__ ) );
 	wp_register_script( 'cshp-wm-sidabar', plugins_url( '/assets/js/sidebars.js', __FILE__ ), array( 'jquery' ) );
-	
+
 	//Add scriopts and style on the needed admin screen
 	switch ( $hook ) :
 		case 'widgets.php':
@@ -235,9 +235,9 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 								);
 							?>" class="item-move-down"><abbr title="<?php esc_attr_e('Move down'); ?>">&#8595;</abbr></a>
 						</span>
-						<a class="item-edit" id="edit-<?php echo $item_id; ?>" title="<?php esc_attr_e('Edit Menu Item'); ?>" href="<?php
+						<a class="item-edit" id="edit-<?php echo $item_id; ?>" href="<?php
 							echo ( isset( $_GET['edit-menu-item'] ) && $item_id == $_GET['edit-menu-item'] ) ? admin_url( 'nav-menus.php' ) : add_query_arg( 'edit-menu-item', $item_id, remove_query_arg( $removed_args, admin_url( 'nav-menus.php#menu-item-settings-' . $item_id ) ) );
-						?>"><?php _e( 'Edit Menu Item' ); ?></a>
+						?>" aria-label="<?php esc_attr_e( 'Edit menu item' ); ?>"><span class="screen-reader-text"><?php _e( 'Edit' ); ?></span></a>
 					</span>
 				</dt>
 			</dl>
