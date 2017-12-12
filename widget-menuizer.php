@@ -9,6 +9,7 @@ Author URI: http://cornershopcreative.com
 License: GPLv2 or later
 Text Domain: widget-menuizer
 */
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 /**
  * Add our tiny bit of CSS
@@ -107,7 +108,8 @@ add_action( 'admin_init', 'menuizer_meta_box', 99 );
  */
 
 // Load all the nav menu interface functions
-require_once( ABSPATH . 'wp-admin/includes/nav-menu.php' );
+if ( ! class_exists( 'Walker_Nav_Menu_Edit' ) )
+	require_once( ABSPATH . 'wp-admin/includes/nav-menu.php' );
 
 class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 
