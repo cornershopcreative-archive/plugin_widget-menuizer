@@ -1,0 +1,46 @@
+/* CSS Document */
+.sidebar-name h2{
+	display: inline-block;
+	vertical-align: middle;
+}
+#cshp-wm-widget-area-create{
+	margin: 8px auto;
+	border-radius: 0px;
+	background-color: #fff;
+	padding: 15px;
+	border: 1px solid #dfdfdf;
+}
+#cshp-wm-widget-area-create h2{
+	margin-top: 0;
+}
+#cshp-wm-widget-area-create h2 .spinner{
+	float: none;
+	position: relative;
+	top: -2px;
+	margin: -5px 5px;
+}
+#cshp-wm-widget-area-create .sidebar-description p.description{
+	margin: 0;
+	font-style: normal;
+	color: #777;
+}
+.button.cshp-wm-widget-area-remove {
+	color: #fff;
+	background-color: #d9534f;
+	border-color: #d43f3a;
+	vertical-align: middle;
+	margin-right: 0;
+	display: inline-block;
+	padding: 0 8px;
+}
+.button.cshp-wm-widget-area-remove:hover {
+	color: #fff;
+	background-color: #c9302c;
+	border-color: #ac2925;
+}
+.button.cshp-wm-widget-area-remove .dashicons:before{
+	vertical-align: middle;
+}
+.button.cshp-wm-refresh-widget-area{
+	margin-right: 15px;
+}

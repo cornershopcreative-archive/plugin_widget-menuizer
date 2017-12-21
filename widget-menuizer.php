@@ -11,14 +11,33 @@ Text Domain: widget-menuizer
 */
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
+define( 'CSHP_WM_PATH', plugin_dir_path( __FILE__ ) );
 /**
  * Add our tiny bit of CSS
  */
-function menuizer_admin_styles() {
+function menuizer_admin_styles( $hook ) {
+	//register scripts and styles
 	wp_register_style( 'menuizer_stylesheet', plugins_url( '/widget-menuizer.css', __FILE__ ) );
-	wp_enqueue_style( 'menuizer_stylesheet' );
+	wp_register_style( 'cshp-wm-sidabar', plugins_url( '/assets/css/sidebars.css', __FILE__ ) );
+	wp_register_script( 'cshp-wm-sidabar', plugins_url( '/assets/js/sidebars.js', __FILE__ ), array( 'jquery' ) );
+
+	//Add scriopts and style on the needed admin screen
+	switch ( $hook ) :
+		case 'widgets.php':
+			wp_enqueue_script( 'cshp-wm-sidabar' );
+			wp_localize_script( 'cshp-wm-sidabar', 'cshp_wm_sidebars_options', array(
+				'ajaxurl'		=> admin_url( 'admin-ajax.php' ),
+				'cshp_wm_sidebars_nonce'	=> wp_create_nonce( 'cshp_wm_sidebars_nonce' ),
+			) );
+
+			wp_enqueue_style( 'cshp-wm-sidabar' );
+			break;
+		case 'nav-menus.php':
+			wp_enqueue_style( 'menuizer_stylesheet' );
+			break;
+	endswitch;
 }
-add_action( 'admin_enqueue_scripts', 'menuizer_admin_styles' );
+add_action( 'admin_enqueue_scripts', 'menuizer_admin_styles', 10, 1 );
 
 /**
  * Generate a metabox for the sidebars item.
@@ -216,9 +235,9 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 								);
 							?>" class="item-move-down"><abbr title="<?php esc_attr_e('Move down'); ?>">&#8595;</abbr></a>
 						</span>
-						<a class="item-edit" id="edit-<?php echo $item_id; ?>" title="<?php esc_attr_e('Edit Menu Item'); ?>" href="<?php
+						<a class="item-edit" id="edit-<?php echo $item_id; ?>" href="<?php
 							echo ( isset( $_GET['edit-menu-item'] ) && $item_id == $_GET['edit-menu-item'] ) ? admin_url( 'nav-menus.php' ) : add_query_arg( 'edit-menu-item', $item_id, remove_query_arg( $removed_args, admin_url( 'nav-menus.php#menu-item-settings-' . $item_id ) ) );
-						?>"><?php _e( 'Edit Menu Item' ); ?></a>
+						?>" aria-label="<?php esc_attr_e( 'Edit menu item' ); ?>"><span class="screen-reader-text"><?php _e( 'Edit' ); ?></span></a>
 					</span>
 				</dt>
 			</dl>
@@ -451,3 +470,5 @@ function menuizer_nav_menu_start_el( $item_output, $item, $depth, $args ) {
 	return $item_output;
 }
 add_filter( 'walker_nav_menu_start_el', 'menuizer_nav_menu_start_el', 99, 4 );
+
+require_once( CSHP_WM_PATH . '/inc/sidebars.php' );
