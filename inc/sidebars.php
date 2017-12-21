@@ -94,9 +94,9 @@ function cshp_wm_widgets_init() {
 		foreach ( $cshp_sidebars['areas'] as $id => $sidebar ) :
 			// register each sidebar.
 			register_sidebar( array(
-				'name'          => sanitize_text_field( $sidebar['name'] ),
+				'name'          => stripslashes( sanitize_text_field( $sidebar['name'] ) ),
 				'id'            => sanitize_text_field( $id ),
-				'description'   => sanitize_text_field( $sidebar['description'] ),
+				'description'   => stripslashes( sanitize_text_field( $sidebar['description'] ) ),
 				'before_widget' => '<div id="%1$s" class="widget %2$s">',
 				'after_widget'  => '</div>',
 				'before_title'  => '<h4 class="widget-title">',
