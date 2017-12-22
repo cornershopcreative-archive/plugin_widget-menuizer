@@ -7,7 +7,7 @@ Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Unlock the full potential of the WordPress menu system by putting your theme's sidebar regions and widgets into your menus.
+Create mega menus, put search forms into your nav, and unlock the full potential of the WordPress menu system by putting your theme's sidebar regions and widgets into your menus.
 
 == Description ==
 
@@ -17,7 +17,9 @@ Upon activation, when you visit the menu management screen under *Appearance > M
 
 Once in your menu, you'll see a new option, "Container Element," which lets you control which HTML tag is wrapped around the sidebars that are output into the menu.
 
-Because it's possible to put menu widgets inside sidebars, you may see a warning notice if the sidebar region you've put in your menu contains a menu widget. This is because you may have inadvertantly created a recursion: if the menu contained in your sidebar is the same menu your sidebar is placed in, you'll have an infinite loop that will do bad, bad things. So be careful.
+Because it's possible to put menu widgets inside sidebars, you may see a warning notice if the sidebar region you've put in your menu contains a menu widget. This is because you may have inadvertently created a recursion: if the menu contained in your sidebar is the same menu your sidebar is placed in, you'll have an infinite loop that will do bad, bad things. So be careful.
+
+*New in 0.6* Widget Menuizer now provides a way for site administrators to create new Sidebars on the fly from the Widget admin! Now you can create new sidebars for use in your menus without having to edit your theme files or use some other plugin to let you register new sidebars.
 
 == Installation ==
 
@@ -51,6 +53,10 @@ If you're using a child theme and its regions are defined in the parent, everyth
 
 In the upper right corner of your window, click on 'Screen Options' and make sure the Sidebars box is checked.
 
+= How can I create a sidebar specifically for use in a menu that doesn't appear elsewhere in my theme? All my theme's sidebars are used elsewhere. =
+
+Now with version 0.6 of Widget Menuizer, when you go to *Appearance > Widgets*, you have the option to "Add a New Sidebar." Use the form to create as many new sidebar regions as you want, which you can then insert into your menus like any other sidebars.
+
 == Screenshots ==
 
 1. After installation and activation, "Sidebars" should appear as an option in the menu management screen.
@@ -59,6 +65,10 @@ In the upper right corner of your window, click on 'Screen Options' and make sur
 4. Options for the HTML5 element used to contain the sidebar region. What you choose here depends on your theme and CSS; you will probably want to set this to whatever wrapper element the sidebar is usually displayed within for optimal appearance. Regardless, you'll probably need to add some CSS to get it looking exactly how you want.
 
 == Changelog ==
+
+= 0.6 =
+* Introduced a new feature letting site administrators create new Sidebars from the widgets admin
+* Cleaned up some code
 
 = 0.5.8 =
 * Adding missing CSS class to correct appearance of settings sections in the WordPress menu editor
