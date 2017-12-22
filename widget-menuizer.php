@@ -375,7 +375,7 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 						),
 						'delete-menu_item_' . $item_id
 					); ?>"><?php _e( 'Remove' ); ?></a> <span class="meta-sep hide-if-no-js"> | </span> <a class="item-cancel submitcancel hide-if-no-js" id="cancel-<?php echo $item_id; ?>" href="<?php echo esc_url( add_query_arg( array( 'edit-menu-item' => $item_id, 'cancel' => time() ), admin_url( 'nav-menus.php' ) ) );
-						?>#menu-item-settings-<?php echo $item_id; ?>"><?php _e('Cancel'); ?></a>
+						?>#menu-item-settings-<?php echo $item_id; ?>"><?php _e( 'Cancel' ); ?></a>
 				</div>
 
 				<input class="menu-item-data-db-id" type="hidden" name="menu-item-db-id[<?php echo $item_id; ?>]" value="<?php echo $item_id; ?>" />
@@ -397,7 +397,7 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
  * TODO: provide a user-facing alert if something got in our way...
  */
 function override_edit_nav_menu_walker( $class, $menu_id ) {
-	if ( 'Walker_Nav_Menu_Edit' == $class ) {
+	if ( 'Walker_Nav_Menu_Edit' === $class ) {
 		return 'Sidebar_Walker_Nav_Menu_Edit';
 	} else {
 		// return $class;
@@ -412,7 +412,7 @@ add_filter( 'wp_edit_nav_menu_walker', 'override_edit_nav_menu_walker', 99, 2 );
  */
 function menuizer_nav_menu_start_el( $item_output, $item, $depth, $args ) {
 
-	if ( 'sidebar' == $item->type ) {
+	if ( 'sidebar' === $item->type ) {
 
 		/**
 		 * We've hacked up the normal uses of $item's properties as follows:
@@ -429,43 +429,49 @@ function menuizer_nav_menu_start_el( $item_output, $item, $depth, $args ) {
 
 		// output nothing if this item isn't from the currently active theme
 		$theme = basename( get_stylesheet_directory() );
-		if ( $theme != $item->object ) return "";
+		if ( $theme !== $item->object ) {
+			return '';
+		}
 
 		// output nothing if the given sidebar isn't active
-		if ( ! is_active_sidebar( $item->xfn ) ) return "";
+		if ( ! is_active_sidebar( $item->xfn ) ) {
+			return '';
+		}
 
 		// start assembling our output
-		$output = "";
+		$output = '';
 
 		// output the title here, if desired
-		if ( 'outside' == $item->attr_title ) {
+		if ( 'outside' === $item->attr_title ) {
 			$output = '<span class="menuizer-title">' . $item->title . '</span>';
 		}
 
 		// stringify custom classes for inclusion in container
 		$classes = array();
 		foreach ( $item->classes as $class ) {
-			if ( strpos( $class, 'menu-item' ) === false ) $classes[] = $class;
+			if ( strpos( $class, 'menu-item' ) === false ) {
+				$classes[] = $class;
+			}
 		}
-		$classes = implode( " ", $classes );
+		$classes = implode( ' ', $classes );
 
 		// wrap
-		if ( $item->target != 'none' ) {
+		if ( 'none' !== $item->target ) {
 			$output .= '<' . $item->target . ' class="menuizer-container ' . $classes . '">';
 		}
 		// output the title here, if desired
-		if ( 'inside' == $item->attr_title ) {
+		if ( 'inside' === $item->attr_title ) {
 			$output .= '<span class="menuizer-title">' . $item->title . '</span>';
 		}
 		ob_start();
 		dynamic_sidebar( $item->xfn );
 		$output .= ob_get_clean();
-		if ( $item->target != 'none' ) {
+		if ( 'none' !== $item->target ) {
 			$output .= '</' . $item->target . '>';
 		}
 		$item_output = $output;
 
-	}
+	}//end if
 
 	return $item_output;
 }
