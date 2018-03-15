@@ -38,7 +38,7 @@ class CSHP_Widget_Menuizer {
 
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_scripts' ) );
-		add_filter( 'wp_edit_nav_menu_walker', array( &$this, 'override_edit_nav_menu_walker' ), 99, 2 );
+		add_filter( 'wp_edit_nav_menu_walker', array( &$this, 'override_edit_nav_menu_walker' ), 99 );
 		add_filter( 'walker_nav_menu_start_el', array( &$this, 'menuizer_nav_menu_start_el' ), 99, 4 );
 		add_action( 'wp_ajax_cshp_wm_add_widget_area', array( &$this, 'add_widget_area' ) );
 		add_action( 'wp_ajax_cshp_wm_remove_widget_area', array( &$this, 'remove_widget_area' ) );
@@ -167,15 +167,11 @@ class CSHP_Widget_Menuizer {
 	}
 
 	/**
-	 * Tell wp_edit_nav_menu_walker to use our new class
+	 * Tell wp_edit_nav_menu_walker to use our new class in order to display the admin sidebar menu item options.
 	 * TODO: provide a user-facing alert if something got in our way...
 	 */
-	public function override_edit_nav_menu_walker( $class, $menu_id ) {
-		if ( 'Walker_Nav_Menu_Edit' === $class ) {
+	public function override_edit_nav_menu_walker( $class ) {
 			return 'Sidebar_Walker_Nav_Menu_Edit';
-		} else {
-			return 'Sidebar_Walker_Nav_Menu_Edit';
-		}
 	}
 
 	/**
