@@ -1,155 +1,104 @@
 <?php
-/*
+/**
 Plugin Name: Widget Menuizer
 Plugin URI: http://cornershopcreative.com/code/widget-menuizer
 Description: Embed sidebar regions in your WordPress navigation menus.
-Version: 0.6
+Version: 0.7
 Author: Cornershop Creative
 Author URI: http://cornershopcreative.com
 License: GPLv2 or later
 Text Domain: widget-menuizer
-*/
-defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
-
-define( 'CSHP_WM_PATH', plugin_dir_path( __FILE__ ) );
-/**
- * Add our tiny bit of CSS
- */
-function menuizer_admin_styles( $hook ) {
-	//register scripts and styles
-	wp_register_style( 'menuizer_stylesheet', plugins_url( '/widget-menuizer.css', __FILE__ ) );
-	wp_register_style( 'cshp-wm-sidabar', plugins_url( '/assets/css/sidebars.css', __FILE__ ) );
-	wp_register_script( 'cshp-wm-sidabar', plugins_url( '/assets/js/sidebars.js', __FILE__ ), array( 'jquery' ) );
-
-	//Add scriopts and style on the needed admin screen
-	switch ( $hook ) :
-		case 'widgets.php':
-			wp_enqueue_script( 'cshp-wm-sidabar' );
-			wp_localize_script( 'cshp-wm-sidabar', 'cshp_wm_sidebars_options', array(
-				'ajaxurl'		=> admin_url( 'admin-ajax.php' ),
-				'cshp_wm_sidebars_nonce'	=> wp_create_nonce( 'cshp_wm_sidebars_nonce' ),
-			) );
-
-			wp_enqueue_style( 'cshp-wm-sidabar' );
-			break;
-		case 'nav-menus.php':
-			wp_enqueue_style( 'menuizer_stylesheet' );
-			break;
-	endswitch;
-}
-add_action( 'admin_enqueue_scripts', 'menuizer_admin_styles', 10, 1 );
-
-/**
- * Generate a metabox for the sidebars item.
- *
- * @since 3.0.0
- */
-function wp_nav_menu_sidebar_meta_box() {
-	global $_nav_menu_placeholder, $nav_menu_selected_id, $wp_registered_sidebars;
-
-	$_nav_menu_placeholder = 0 > $_nav_menu_placeholder ? $_nav_menu_placeholder - 1 : -1;
-	$theme = basename( get_stylesheet_directory() );
-
-	$removed_args = array(
-		'action',
-		'customlink-tab',
-		'edit-menu-item',
-		'menu-item',
-		'page-tab',
-		'_wpnonce',
-	);
-
-	?>
-	<div class="sidebardiv posttypediv" id="sidebardiv">
-		<div id="sidebar-panel" class="tabs-panel tabs-panel-active">
-			<ul id="sidebar-checklist" class="form-no-clear categorychecklist">
-				<?php
-					foreach ( $wp_registered_sidebars as $id => $sidebar ) :
-						$numeric_id = hexdec( substr(md5( $theme . $id ), 0, 7) );	//this is just a placeholder of a unique id to keep WP from getting confused
-					?>
-					<li>
-						<label class="menu-item-title">
-							<input type="checkbox" class="menu-item-checkbox" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-object-id]" value="<?php echo $numeric_id; ?>">
-							<?php echo $sidebar['name']; ?>
-						</label>
-						<input type="hidden" class="menu-item-db-id" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-db-id]" value="0" />
-						<input type="hidden" class="menu-item-object" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-object]" value="<?php echo $theme; ?>" />
-						<input type="hidden" class="menu-item-parent-id" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-parent-id]" value="0" />
-						<input type="hidden" class="menu-item-type" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-type]" value="sidebar" />
-						<input type="hidden" class="menu-item-title" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-title]" value="<?php echo esc_attr( $sidebar['name'] ); ?>" />
-						<input type="hidden" class="menu-item-url" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-url]" value="" />
-						<input type="hidden" class="menu-item-target" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-target]" value="div" />
-						<input type="hidden" class="menu-item-attr_title" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-attr_title]" value="" />
-						<input type="hidden" class="menu-item-classes" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-classes]" value="" />
-						<input type="hidden" class="menu-item-xfn" name="menu-item[<?php echo $_nav_menu_placeholder; ?>][menu-item-xfn]" value="<?php echo $id ?>" /></li>
-					</li>
-				<?php
-					$_nav_menu_placeholder--;
-				endforeach; ?>
-			</ul>
-		</div>
-
-		<!-- no touch! -->
-		<p class="button-controls">
-			<span class="list-controls">
-				<a href="<?php
-					echo esc_url( add_query_arg(
-						array(
-							'selectall' => 1,
-						),
-						remove_query_arg( $removed_args )
-					));
-				?>#sidebardiv" class="select-all">Select All</a>
-			</span>
-			<span class="add-to-menu">
-				<input type="submit"<?php wp_nav_menu_disabled_check( $nav_menu_selected_id ); ?> class="button-secondary submit-add-to-menu right" value="<?php esc_attr_e('Add to Menu'); ?>" name="add-sidebar-menu-item" id="submit-sidebardiv" />
-				<span class="spinner"></span>
-			</span>
-		</p>
-
-	</div><!-- /.sidebardiv -->
-	<?php
-}
-
-/**
- * Add our metabox to the nav-menus.php sidebar
- */
-function menuizer_meta_box() {
-	add_meta_box( 'add-sidebars', __( 'Sidebars', 'widget-menuizer' ), 'wp_nav_menu_sidebar_meta_box', 'nav-menus', 'side', 'low' );
-}
-add_action( 'admin_init', 'menuizer_meta_box', 99 );
-
-
-/**
- * Implements a new walker to display our sidebar menu item once it's in a menu
- * If WordPress ever changes Walker_Nav_Menu_Edit (defined in wp-admin/includes/nav-menu.php), we've got work to do
- * @uses Walker_Nav_Menu
  */
 
-// Load all the nav menu interface functions
-if ( ! class_exists( 'Walker_Nav_Menu_Edit' ) )
-	require_once( ABSPATH . 'wp-admin/includes/nav-menu.php' );
+defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
-class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
+/**
+ * Main plugin class CSHP_Widget_Menuizer.
+ */
+class CSHP_Widget_Menuizer {
 
 	/**
-	 * Start the element output.
+	 * Plugin version number
 	 *
-	 * @see Walker_Nav_Menu::start_el()
-	 * @since 3.0.0
-	 *
-	 * @param string $output Passed by reference. Used to append additional content.
-	 * @param object $item   Menu item data object.
-	 * @param int    $depth  Depth of menu item. Used for padding.
-	 * @param array  $args   Not used.
-	 * @param int    $id     Not used.
+	 * @var version
 	 */
-	function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
-		global $_wp_nav_menu_max_depth, $wp_registered_sidebars;
-		$_wp_nav_menu_max_depth = $depth > $_wp_nav_menu_max_depth ? $depth : $_wp_nav_menu_max_depth;
+	protected $version = '0.7';
 
-		ob_start();
-		$item_id = esc_attr( $item->ID );
+	/**
+	 * Setting up our class.
+	 */
+	public function __construct() {
+		if ( ! defined( 'CSHP_WM_PATH' ) ) {
+			define( 'CSHP_WM_PATH', plugin_dir_path( __FILE__ ) );
+			define( 'CSHP_WM_URL', plugin_dir_url( __FILE__ ) );
+			define( 'CSHP_WM_TEXTDOMAIN', 'widget-menuizer' );
+		}
+
+		$this->load_dependencies();
+
+		add_action( 'admin_init', array( &$this, 'admin_init' ) );
+		add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_scripts' ) );
+		add_filter( 'wp_edit_nav_menu_walker', array( &$this, 'override_edit_nav_menu_walker' ), 99 );
+		add_filter( 'walker_nav_menu_start_el', array( &$this, 'menuizer_nav_menu_start_el' ), 99, 4 );
+		add_action( 'wp_ajax_cshp_wm_add_widget_area', array( &$this, 'add_widget_area' ) );
+		add_action( 'wp_ajax_cshp_wm_remove_widget_area', array( &$this, 'remove_widget_area' ) );
+		add_action( 'widgets_init', array( &$this, 'widgets_init' ) );
+
+	}
+
+	/**
+	 * Load Dependencies Step.
+	 */
+	private function load_dependencies() {
+		$this->require_all( __DIR__ . DIRECTORY_SEPARATOR . 'inc' );
+	}
+
+	/**
+	 * Perform actions that need to run on admin init.
+	 */
+	public function admin_init() {
+		// Add our metabox to the nav-menus.php sidebar
+		// phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
+		add_meta_box( 'add-sidebars', __( 'Sidebars', CSHP_WM_TEXTDOMAIN ), array( &$this, 'wp_nav_menu_sidebar_meta_box' ), 'nav-menus', 'side', 'low' );
+	}
+
+	/**
+	 * Add our tiny bit of CSS
+	 */
+	public function admin_enqueue_scripts( $hook ) {
+		// register scripts and styles
+		wp_register_style( 'cshp-wm-stylesheet', CSHP_WM_URL . 'assets/css/widget-menuizer.css', null, $this->version, false );
+		wp_register_style( 'cshp-wm-sidabar', CSHP_WM_URL . 'assets/css/sidebars.css', null, $this->version, false );
+		wp_register_script( 'cshp-wm-sidabar', CSHP_WM_URL . '/assets/js/sidebars.js', array( 'jquery' ), $this->version, true );
+		wp_localize_script(
+			'cshp-wm-sidabar', 'cshp_wm_sidebars_options', array(
+				'ajaxurl'       => admin_url( 'admin-ajax.php' ),
+				'cshp_wm_sidebars_nonce'    => wp_create_nonce( 'cshp_wm_sidebars_nonce' ),
+			)
+		);
+
+		// Add scripts and style on the needed admin screen
+		switch ( $hook ) :
+			case 'widgets.php':
+				wp_enqueue_script( 'cshp-wm-sidabar' );
+				wp_enqueue_style( 'cshp-wm-sidabar' );
+				break;
+			case 'nav-menus.php':
+				wp_enqueue_style( 'menuizer_stylesheet' );
+		endswitch;
+	}
+
+	/**
+	 * Generate a metabox for the sidebars item.
+	 *
+	 * @since 3.0.0
+	 */
+	public function wp_nav_menu_sidebar_meta_box() {
+		global $_nav_menu_placeholder, $nav_menu_selected_id, $wp_registered_sidebars;
+		// phpcs:ignore WordPress.Variables.GlobalVariables.OverrideProhibited
+		$_nav_menu_placeholder = 0 > $_nav_menu_placeholder ? $_nav_menu_placeholder - 1 : -1;
+		$theme = basename( get_stylesheet_directory() );
+
 		$removed_args = array(
 			'action',
 			'customlink-tab',
@@ -159,322 +108,275 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 			'_wpnonce',
 		);
 
-		$original_title = '';
-		if ( 'taxonomy' == $item->type ) {
-			$original_title = get_term_field( 'name', $item->object_id, $item->object, 'raw' );
-			if ( is_wp_error( $original_title ) )
-				$original_title = false;
-		} elseif ( 'post_type' == $item->type ) {
-			$original_object = get_post( $item->object_id );
-			$original_title = get_the_title( $original_object->ID );
-		} elseif ( 'sidebar' == $item->type ) {
-			$original_title = $wp_registered_sidebars[ $item->xfn ]['name'];
-			$item->type_label = __( 'Sidebar' );
-		}
-
-		$classes = array(
-			'menu-item menu-item-depth-' . $depth,
-			'menu-item-' . esc_attr( $item->object ),
-			'menu-item-edit-' . ( ( isset( $_GET['edit-menu-item'] ) && $item_id == $_GET['edit-menu-item'] ) ? 'active' : 'inactive'),
-		);
-
-		//if the menu item is a sidebar and it belongs to a theme other than the active one, it's invalid
-		if ( 'sidebar' == $item->type &&  basename( get_stylesheet_directory() ) != $item->object ) {
-			$item->_invalid = __('This sidebar cannot be displayed as it is not from the currently active theme', 'widget-menuizer');
-		}
-
-		$title = $item->title;
-
-		if ( ! empty( $item->_invalid ) ) {
-			$classes[] = 'menu-item-invalid';
-			/* translators: %s: title of menu item which is invalid */
-			$title = sprintf( __( '%s (Invalid)' ), $item->title );
-		} elseif ( isset( $item->post_status ) && 'draft' == $item->post_status ) {
-			$classes[] = 'pending';
-			/* translators: %s: title of menu item in draft status */
-			$title = sprintf( __('%s (Pending)'), $item->title );
-		}
-
-		$title = ( ! isset( $item->label ) || '' == $item->label ) ? $title : $item->label;
-
-		$submenu_text = '';
-		if ( 0 == $depth )
-			$submenu_text = 'style="display: none;"';
-
 		?>
-		<li id="menu-item-<?php echo $item_id; ?>" class="<?php echo implode(' ', $classes ); ?>">
-			<dl class="menu-item-bar">
-				<dt class="menu-item-handle">
-					<span class="item-title"><span class="menu-item-title"><?php echo esc_html( $title ); ?></span> <span class="is-submenu" <?php echo $submenu_text; ?>><?php _e( 'sub item' ); ?></span></span>
-					<span class="item-controls">
-						<span class="item-type"><?php echo esc_html( $item->type_label ); ?></span>
-						<span class="item-order hide-if-js">
-							<a href="<?php
-								echo wp_nonce_url(
-									add_query_arg(
-										array(
-											'action' => 'move-up-menu-item',
-											'menu-item' => $item_id,
-										),
-										remove_query_arg($removed_args, admin_url( 'nav-menus.php' ) )
-									),
-									'move-menu_item'
-								);
-							?>" class="item-move-up"><abbr title="<?php esc_attr_e('Move up'); ?>">&#8593;</abbr></a>
-							|
-							<a href="<?php
-								echo wp_nonce_url(
-									add_query_arg(
-										array(
-											'action' => 'move-down-menu-item',
-											'menu-item' => $item_id,
-										),
-										remove_query_arg($removed_args, admin_url( 'nav-menus.php' ) )
-									),
-									'move-menu_item'
-								);
-							?>" class="item-move-down"><abbr title="<?php esc_attr_e('Move down'); ?>">&#8595;</abbr></a>
-						</span>
-						<a class="item-edit" id="edit-<?php echo $item_id; ?>" href="<?php
-							echo ( isset( $_GET['edit-menu-item'] ) && $item_id == $_GET['edit-menu-item'] ) ? admin_url( 'nav-menus.php' ) : add_query_arg( 'edit-menu-item', $item_id, remove_query_arg( $removed_args, admin_url( 'nav-menus.php#menu-item-settings-' . $item_id ) ) );
-						?>" aria-label="<?php esc_attr_e( 'Edit menu item' ); ?>"><span class="screen-reader-text"><?php _e( 'Edit' ); ?></span></a>
-					</span>
-				</dt>
-			</dl>
-
-			<div class="menu-item-settings wp-clearfix" id="menu-item-settings-<?php echo $item_id; ?>">
-				<?php if( 'custom' == $item->type ) : ?>
-					<p class="field-url description description-wide">
-						<label for="edit-menu-item-url-<?php echo $item_id; ?>">
-							<?php _e( 'URL' ); ?><br />
-							<input type="text" id="edit-menu-item-url-<?php echo $item_id; ?>" class="widefat code edit-menu-item-url" name="menu-item-url[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->url ); ?>" />
-						</label>
-					</p>
-				<?php endif; ?>
-				<p class="description description-thin">
-					<label for="edit-menu-item-title-<?php echo $item_id; ?>">
-						<?php _e( 'Navigation Label' ); ?><br />
-						<input type="text" id="edit-menu-item-title-<?php echo $item_id; ?>" class="widefat edit-menu-item-title" name="menu-item-title[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->title ); ?>" />
-					</label>
-				</p>
-				<?php if ( 'sidebar' != $item->type ) : ?>
-				<p class="description description-thin">
-					<label for="edit-menu-item-attr-title-<?php echo $item_id; ?>">
-						<?php _e( 'Title Attribute' ); ?><br />
-						<input type="text" id="edit-menu-item-attr-title-<?php echo $item_id; ?>" class="widefat edit-menu-item-attr-title" name="menu-item-attr-title[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->post_excerpt ); ?>" />
-					</label>
-				</p>
-				<p class="field-link-target description">
-					<label for="edit-menu-item-target-<?php echo $item_id; ?>">
-						<input type="checkbox" id="edit-menu-item-target-<?php echo $item_id; ?>" value="_blank" name="menu-item-target[<?php echo $item_id; ?>]"<?php checked( $item->target, '_blank' ); ?> />
-						<?php _e( 'Open link in a new window/tab' ); ?>
-					</label>
-				</p>
-				<?php else: ?>
-				<p class="description description-thin">
-					<label for="edit-menu-item-title-display-<?php echo $item_id; ?>">
-						<?php _e( 'Label Display' ); ?><br />
-						<select id="edit-menu-item-attr-title-<?php echo $item_id; ?>" class="widefat" name="menu-item-attr-title[<?php echo $item_id; ?>]" >
-						<?php
-							$options = array( 'none' => __('None', 'widget-menuizer'), 'inside' => __('Inside container', 'widget-menuizer'), 'outside' => __('Outside container', 'widget-menuizer') );
-							foreach ( $options as $value => $label ) : ?>
-								<option value="<?php echo $value; ?>" <?php selected( $item->attr_title, $value ); ?>><?php echo $label; ?></option>
-							<?php endforeach; ?>
+		<div class="sidebardiv posttypediv" id="sidebardiv">
+			<div id="sidebar-panel" class="tabs-panel tabs-panel-active">
+				<ul id="sidebar-checklist" class="form-no-clear categorychecklist">
+					<?php
+					foreach ( $wp_registered_sidebars as $id => $sidebar ) :
+						$numeric_id = hexdec( substr( md5( $theme . $id ), 0, 7 ) );
+						// this is just a placeholder of a unique id to keep WP from getting confused
 						?>
-						</select>
-					</label>
-				</p>
-				<?php endif; ?>
-				<p class="field-css-classes description description-thin">
-					<label for="edit-menu-item-classes-<?php echo $item_id; ?>">
-						<?php _e( 'CSS Classes (optional)' ); ?><br />
-						<input type="text" id="edit-menu-item-classes-<?php echo $item_id; ?>" class="widefat code edit-menu-item-classes" name="menu-item-classes[<?php echo $item_id; ?>]" value="<?php echo esc_attr( implode(' ', $item->classes ) ); ?>" />
-					</label>
-				</p>
-				<?php if( 'sidebar' == $item->type ) : ?>
-					<input type="hidden" id="edit-menu-item-xfn-<?php echo $item_id; ?>" name="menu-item-xfn[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->xfn ); ?>" />
-					<p class="field-link-container-target-proxy description description-thin">
-						<label for="edit-menu-item-target-<?php echo $item_id; ?>">
-							<?php _e( 'Container Element', 'widget-menuizer' ); ?><br />
-							<select id="edit-menu-item-target-<?php echo $item_id; ?>" class="widefat" name="menu-item-target[<?php echo $item_id; ?>]" >
-							<?php
-								$elements = array( 'div', 'span', 'ul', 'ol', 'article', 'section', 'aside', 'none' );
-								foreach ( $elements as $elem ) : ?>
-									<option value="<?php echo $elem; ?>" <?php selected( $item->target, $elem ); ?>><?php echo $elem; ?></option>
-								<?php endforeach;
-							?></select>
+						<li>
+						<label class="menu-item-title">
+							<input type="checkbox" class="menu-item-checkbox" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-object-id]" value="<?php echo esc_attr( $numeric_id ); ?>">
+							<?php echo esc_html( $sidebar['name'] ); ?>
 						</label>
-					</p>
-				<?php else : ?>
-				<p class="field-xfn description description-thin">
-					<label for="edit-menu-item-xfn-<?php echo $item_id; ?>">
-						<?php _e( 'Link Relationship (XFN)' ); ?><br />
-						<input type="text" id="edit-menu-item-xfn-<?php echo $item_id; ?>" class="widefat code edit-menu-item-xfn" name="menu-item-xfn[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->xfn ); ?>" />
-					</label>
-				</p>
-				<?php endif; ?>
-				<p class="field-description description description-wide">
-					<label for="edit-menu-item-description-<?php echo $item_id; ?>">
-						<?php _e( 'Description' ); ?><br />
-						<textarea id="edit-menu-item-description-<?php echo $item_id; ?>" class="widefat edit-menu-item-description" rows="3" cols="20" name="menu-item-description[<?php echo $item_id; ?>]"><?php echo esc_html( $item->description ); // textarea_escaped ?></textarea>
-						<span class="description"><?php _e('The description will be displayed in the menu if the current theme supports it.'); ?></span>
-					</label>
-				</p>
+						<input type="hidden" class="menu-item-db-id" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-db-id]" value="0" />
+						<input type="hidden" class="menu-item-object" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-object]" value="<?php echo esc_attr( $theme ); ?>" />
+						<input type="hidden" class="menu-item-parent-id" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-parent-id]" value="0" />
+						<input type="hidden" class="menu-item-type" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-type]" value="sidebar" />
+						<input type="hidden" class="menu-item-title" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-title]" value="<?php echo esc_attr( $sidebar['name'] ); ?>" />
+						<input type="hidden" class="menu-item-url" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-url]" value="" />
+						<input type="hidden" class="menu-item-target" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-target]" value="div" />
+						<input type="hidden" class="menu-item-attr_title" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-attr_title]" value="" />
+						<input type="hidden" class="menu-item-classes" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-classes]" value="" />
+						<input type="hidden" class="menu-item-xfn" name="menu-item[<?php echo esc_attr( $_nav_menu_placeholder ); ?>][menu-item-xfn]" value="<?php echo esc_attr( $id ); ?>" /></li>
+						</li>
+					<?php
+					$_nav_menu_placeholder--;
+					endforeach;
+					?>
+				</ul>
+			</div>
 
-				<p class="field-move hide-if-no-js description description-wide">
-					<label>
-						<span><?php _e( 'Move' ); ?></span>
-						<a href="#" class="menus-move-up"><?php _e( 'Up one' ); ?></a>
-						<a href="#" class="menus-move-down"><?php _e( 'Down one' ); ?></a>
-						<a href="#" class="menus-move-left"></a>
-						<a href="#" class="menus-move-right"></a>
-						<a href="#" class="menus-move-top"><?php _e( 'To the top' ); ?></a>
-					</label>
-				</p>
+			<!-- no touch! -->
+			<p class="button-controls">
+				<span class="list-controls">
+					<a href="
+					<?php
+						echo esc_url(
+							add_query_arg(
+								array(
+									'selectall' => 1,
+								),
+								remove_query_arg( $removed_args )
+							)
+						);
+					?>
+					#sidebardiv" class="select-all">Select All</a>
+				</span>
+				<span class="add-to-menu">
+					<input type="submit"<?php wp_nav_menu_disabled_check( $nav_menu_selected_id ); ?> class="button-secondary submit-add-to-menu right" value="<?php esc_attr_e( 'Add to Menu' ); ?>" name="add-sidebar-menu-item" id="submit-sidebardiv" />
+					<span class="spinner"></span>
+				</span>
+			</p>
 
-				<div class="menu-item-actions description-wide submitbox">
-					<?php if ( 'sidebar' == $item->type ) : ?>
-						<p class="link-to-original">
-							<?php printf( __('Sidebar Shown: %s', 'widget-menuizer'), '<a href="' . admin_url( 'widgets.php' ) . '">' . esc_html( $original_title ) . '</a>' ); ?>
-						</p>
-						<?php // flag invalid reasons
-						if ( ! empty ( $item->_invalid ) ) : ?>
-							<p class="warning invalid">
-								<?php echo $item->_invalid; ?>
-							</p>
-						<?php endif; ?>
-
-						<?php
-						// if necessary, flag for potential recursion
-						$current_widgets = get_option( 'sidebars_widgets' );
-						$found_menu = false;
-						foreach ( $current_widgets[ $item->xfn ] as $widget_type ) {
-							if ( strpos( $widget_type, 'nav_menu' ) === 0 ) {
-								$found_menu = true;
-								break;
-							}
-						}
-						if ( $found_menu ) : ?>
-							<p class="warning recursion">
-								<?php _e( 'This sidebar contains a menu widget! Please ensure the widget doesn’t contain this menu or an infinite loop will result.'); ?>
-							</p>
-						<?php endif; ?>
-					<?php elseif( 'custom' != $item->type && $original_title !== false ) : ?>
-						<p class="link-to-original">
-							<?php printf( __('Original: %s'), '<a href="' . esc_attr( $item->url ) . '">' . esc_html( $original_title ) . '</a>' ); ?>
-						</p>
-					<?php endif; ?>
-					<a class="item-delete submitdelete deletion" id="delete-<?php echo $item_id; ?>" href="<?php
-					echo wp_nonce_url(
-						add_query_arg(
-							array(
-								'action' => 'delete-menu-item',
-								'menu-item' => $item_id,
-							),
-							admin_url( 'nav-menus.php' )
-						),
-						'delete-menu_item_' . $item_id
-					); ?>"><?php _e( 'Remove' ); ?></a> <span class="meta-sep hide-if-no-js"> | </span> <a class="item-cancel submitcancel hide-if-no-js" id="cancel-<?php echo $item_id; ?>" href="<?php echo esc_url( add_query_arg( array( 'edit-menu-item' => $item_id, 'cancel' => time() ), admin_url( 'nav-menus.php' ) ) );
-						?>#menu-item-settings-<?php echo $item_id; ?>"><?php _e( 'Cancel' ); ?></a>
-				</div>
-
-				<input class="menu-item-data-db-id" type="hidden" name="menu-item-db-id[<?php echo $item_id; ?>]" value="<?php echo $item_id; ?>" />
-				<input class="menu-item-data-object-id" type="hidden" name="menu-item-object-id[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->object_id ); ?>" />
-				<input class="menu-item-data-object" type="hidden" name="menu-item-object[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->object ); ?>" />
-				<input class="menu-item-data-parent-id" type="hidden" name="menu-item-parent-id[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->menu_item_parent ); ?>" />
-				<input class="menu-item-data-position" type="hidden" name="menu-item-position[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->menu_order ); ?>" />
-				<input class="menu-item-data-type" type="hidden" name="menu-item-type[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->type ); ?>" />
-			</div><!-- .menu-item-settings-->
-			<ul class="menu-item-transport"></ul>
+		</div><!-- /.sidebardiv -->
 		<?php
-		$output .= ob_get_clean();
 	}
 
-} // Sidebar_Walker_Nav_Menu_Edit
-
-/**
- * Tell wp_edit_nav_menu_walker to use our new class
- * TODO: provide a user-facing alert if something got in our way...
- */
-function override_edit_nav_menu_walker( $class, $menu_id ) {
-	if ( 'Walker_Nav_Menu_Edit' === $class ) {
-		return 'Sidebar_Walker_Nav_Menu_Edit';
-	} else {
-		// return $class;
-		return 'Sidebar_Walker_Nav_Menu_Edit';
+	/**
+	 * Tell wp_edit_nav_menu_walker to use our new class in order to display the admin sidebar menu item options.
+	 * TODO: provide a user-facing alert if something got in our way...
+	 */
+	public function override_edit_nav_menu_walker( $class ) {
+			return 'Sidebar_Walker_Nav_Menu_Edit';
 	}
-}
-add_filter( 'wp_edit_nav_menu_walker', 'override_edit_nav_menu_walker', 99, 2 );
 
+	/**
+	 * When outputting a menu, spit out our sidebar if specified
+	 */
+	public function menuizer_nav_menu_start_el( $item_output, $item, $depth, $args ) {
 
-/**
- * When outputting a menu, spit out our sidebar if specified
- */
-function menuizer_nav_menu_start_el( $item_output, $item, $depth, $args ) {
+		if ( 'sidebar' === $item->type ) {
 
-	if ( 'sidebar' === $item->type ) {
+			/**
+			 * We've hacked up the normal uses of $item's properties as follows:
+			 * $item->type       = sidebar
+			 * $item->object_id  = an arbitrary md5-ish value to keep WP happy
+			 * $item->object     = the theme this sidebar belongs to, e.g. twentyfourteen
+			 * $item->target     = the container element (div, ul, ol, aside, span, etc)
+			 * $item->classes    = the 'classes' textfield, as normal
+			 * $item->title      = the 'title' textfield, as normal
+			 * $item->xfn        = the machine name of the sidebar to show
+			 * $item->attr_title = location to show the title (none|inside|outside)
+			 * $item->url        = can't be used as WP only saves this if the type == 'custom'... sigh
+			 */
 
-		/**
-		 * We've hacked up the normal uses of $item's properties as follows:
-		 * $item->type       = sidebar
-		 * $item->object_id  = an arbitrary md5-ish value to keep WP happy
-		 * $item->object     = the theme this sidebar belongs to, e.g. twentyfourteen
-		 * $item->target     = the container element (div, ul, ol, aside, span, etc)
-		 * $item->classes    = the 'classes' textfield, as normal
-		 * $item->title      = the 'title' textfield, as normal
-		 * $item->xfn        = the machine name of the sidebar to show
-		 * $item->attr_title = location to show the title (none|inside|outside)
-		 * $item->url        = can't be used as WP only saves this if the type == 'custom'... sigh
-		 */
+			// output nothing if this item isn't from the currently active theme
+			$theme = basename( get_stylesheet_directory() );
+			if ( $theme !== $item->object ) {
+				return '';
+			}
 
-		// output nothing if this item isn't from the currently active theme
-		$theme = basename( get_stylesheet_directory() );
-		if ( $theme !== $item->object ) {
-			return '';
+			// output nothing if the given sidebar isn't active
+			if ( ! is_active_sidebar( $item->xfn ) ) {
+				return '';
+			}
+
+			// start assembling our output
+			$output = '';
+
+			// output the title here, if desired
+			if ( 'outside' === $item->attr_title ) {
+				$output = '<span class="menuizer-title">' . $item->title . '</span>';
+			}
+
+			// stringify custom classes for inclusion in container
+			$classes = array();
+			foreach ( $item->classes as $class ) {
+				if ( strpos( $class, 'menu-item' ) === false ) {
+					$classes[] = $class;
+				}
+			}
+			$classes = implode( ' ', $classes );
+
+			// wrap
+			if ( 'none' !== $item->target ) {
+				$output .= '<' . $item->target . ' class="menuizer-container ' . $classes . '">';
+			}
+			// output the title here, if desired
+			if ( 'inside' === $item->attr_title ) {
+				$output .= '<span class="menuizer-title">' . $item->title . '</span>';
+			}
+			ob_start();
+			dynamic_sidebar( $item->xfn );
+			$output .= ob_get_clean();
+			if ( 'none' !== $item->target ) {
+				$output .= '</' . $item->target . '>';
+			}
+			$item_output = $output;
+
+		}//end if
+
+		return $item_output;
+	}
+
+	/**
+	 * Add user-created sidebar.
+	 * triggered by add sidebar button under the add a new sidebar section on the widgets area.
+	 */
+	public function add_widget_area() {
+		// Check Nonce or die.
+		if ( ! wp_verify_nonce( $_POST['cshp_wm_sidebars_nonce'], 'cshp_wm_sidebars_nonce' ) && ! isset( $_POST['cshp_wm_widget_area_name'] ) ) {
+			die( -1 );
 		}
-
-		// output nothing if the given sidebar isn't active
-		if ( ! is_active_sidebar( $item->xfn ) ) {
-			return '';
+		// get sidebars wp option.
+		$cshp_sidebars = get_option( 'cshp_wm_widget_areas' );
+		// get widget area name
+		$widget_area_name = sanitize_text_field( $_POST['cshp_wm_widget_area_name'] );
+		// create the slug part
+		$slug = sanitize_title_with_dashes( $widget_area_name, '', 'save' );
+		// Check If Sidebar already exists.
+		if ( isset( $cshp_sidebars['areas'][ 'cshp-wm-widget-area-' . $slug ] ) ) {
+			echo wp_json_encode(
+				array(
+					'status'  => 'error',
+					'message' => sprintf(
+						'<strong>%1$s</strong> widget area already exists. Please use a different name.',
+						esc_html( $widget_area_name )
+					),
+				)
+			);
+			die( -1 );
 		}
+		// get widget area description
+		$widget_area_desc = isset( $_POST['cshp_wm_widget_area_desc'] ) ? sanitize_text_field( $_POST['cshp_wm_widget_area_desc'] ) : '';
+		// setup sidebar in array.
+		$cshp_sidebars['areas'][ 'cshp-wm-widget-area-' . $slug ]['name'] = $widget_area_name;
+		$cshp_sidebars['areas'][ 'cshp-wm-widget-area-' . $slug ]['description'] = $widget_area_desc;
+		// update the sidebar wp option.
+		update_option( 'cshp_wm_widget_areas', $cshp_sidebars, true );
+		// echo message back on AJAX.
+		echo wp_json_encode(
+			array(
+				'status'  => 'success',
+				'message' => sprintf(
+					'<strong>%1$s</strong> widget area has been created. You can create more areas, once you finish update the page to see all the areas.',
+					esc_html( $widget_area_name )
+				),
+			)
+		);
+		// die.
+		die();
+	}
 
-		// start assembling our output
-		$output = '';
-
-		// output the title here, if desired
-		if ( 'outside' === $item->attr_title ) {
-			$output = '<span class="menuizer-title">' . $item->title . '</span>';
+	/**
+	 * Remove user-created sidebar.
+	 * triggered by each of the sidebars button.
+	 */
+	public function remove_widget_area() {
+		// Check Nonce or die.
+		if ( ! wp_verify_nonce( $_POST['cshp_wm_sidebars_nonce'], 'cshp_wm_sidebars_nonce' ) && ! isset( $_POST['cshp_wm_widget_area_name'] ) ) {
+			die( -1 );
 		}
+		// save the widget area id.
+		$widget_area_name = $_POST['cshp_wm_widget_area_name'];
+		// get sidebars wp option.
+		$cshp_sidebars = get_option( 'cshp_wm_widget_areas' );
+		// unset the sidebar from the array
+		unset( $cshp_sidebars['areas'][ $widget_area_name ] );
+		// update the sidebars wp option
+		if ( update_option( 'cshp_wm_widget_areas', $cshp_sidebars, true ) ) {
+			echo wp_json_encode(
+				array(
+					'status'  => 'success',
+					'sidebarId' => $widget_area_name,
+				)
+			);
+			die();
+		}
+		// die.
+		die();
+	}
 
-		// stringify custom classes for inclusion in container
-		$classes = array();
-		foreach ( $item->classes as $class ) {
-			if ( strpos( $class, 'menu-item' ) === false ) {
-				$classes[] = $class;
+	/**
+	 * Register All User-created sidebars
+	 */
+	public function widgets_init() {
+		// get sidebars wp option.
+		$cshp_sidebars = get_option( 'cshp_wm_widget_areas' );
+		// check that there are sidebars to register.
+		if ( $cshp_sidebars['areas'] ) :
+			// loop through sidebars.
+			foreach ( $cshp_sidebars['areas'] as $id => $sidebar ) :
+				// register each sidebar.
+				register_sidebar(
+					array(
+						'name'          => stripslashes( sanitize_text_field( $sidebar['name'] ) ),
+						'id'            => sanitize_text_field( $id ),
+						'description'   => stripslashes( sanitize_text_field( $sidebar['description'] ) ),
+						'before_widget' => '<div id="%1$s" class="widget %2$s">',
+						'after_widget'  => '</div>',
+						'before_title'  => '<h4 class="widget-title">',
+						'after_title'   => '</h4>',
+					)
+				);
+			endforeach;
+		endif;
+	}
+
+	/**
+	 * Include other functions
+	 */
+	protected function require_all( $dir, $depth = 0 ) {
+		// strip slashes from end of string
+		$dir = rtrim( $dir, '/\\' );
+		// require all php files
+		$scan = glob( $dir . DIRECTORY_SEPARATOR . '*' );
+		foreach ( $scan as $path ) {
+			if ( preg_match( '/\.php$|\.inc$/', $path ) ) {
+				require_once $path;
+			} elseif ( is_dir( $path ) ) {
+				$this->require_all( $path, $depth + 1 );
 			}
 		}
-		$classes = implode( ' ', $classes );
+	}
 
-		// wrap
-		if ( 'none' !== $item->target ) {
-			$output .= '<' . $item->target . ' class="menuizer-container ' . $classes . '">';
-		}
-		// output the title here, if desired
-		if ( 'inside' === $item->attr_title ) {
-			$output .= '<span class="menuizer-title">' . $item->title . '</span>';
-		}
-		ob_start();
-		dynamic_sidebar( $item->xfn );
-		$output .= ob_get_clean();
-		if ( 'none' !== $item->target ) {
-			$output .= '</' . $item->target . '>';
-		}
-		$item_output = $output;
-
-	}//end if
-
-	return $item_output;
+	/**
+	 * Get the plugin version number.
+	 */
+	public function get_version() {
+		return $this->version;
+	}
 }
-add_filter( 'walker_nav_menu_start_el', 'menuizer_nav_menu_start_el', 99, 4 );
 
-require_once( CSHP_WM_PATH . '/inc/sidebars.php' );
+/**
+ * Let's load our plugin class.
+ */
+function run_cshp_widget_menuizer() {
+	$cshp_wm = new CSHP_Widget_Menuizer();
+}
+
+run_cshp_widget_menuizer();
