@@ -77,7 +77,7 @@ class CSHP_Widget_Menuizer {
 			)
 		);
 
-		// Add scriopts and style on the needed admin screen
+		// Add scripts and style on the needed admin screen
 		switch ( $hook ) :
 			case 'widgets.php':
 				wp_enqueue_script( 'cshp-wm-sidabar' );
@@ -244,7 +244,7 @@ class CSHP_Widget_Menuizer {
 	}
 
 	/**
-	 * Add user created sidebar.
+	 * Add user-created sidebar.
 	 * triggered by add sidebar button under the add a new sidebar section on the widgets area.
 	 */
 	public function add_widget_area() {
@@ -293,7 +293,7 @@ class CSHP_Widget_Menuizer {
 	}
 
 	/**
-	 * Remove user created sidebar.
+	 * Remove user-created sidebar.
 	 * triggered by each of the sidebars button.
 	 */
 	public function remove_widget_area() {
@@ -322,7 +322,7 @@ class CSHP_Widget_Menuizer {
 	}
 
 	/**
-	 * Register All User created sidebars
+	 * Register All User-created sidebars
 	 */
 	public function widgets_init() {
 		// get sidebars wp option.
@@ -373,7 +373,7 @@ class CSHP_Widget_Menuizer {
 }
 
 /**
- * Lets load our plugin class.
+ * Let's load our plugin class.
  */
 function run_cshp_widget_menuizer() {
 	$cshp_wm = new CSHP_Widget_Menuizer();
