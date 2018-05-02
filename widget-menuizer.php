@@ -80,10 +80,10 @@ class CSHP_Widget_Menuizer {
 	public function admin_enqueue_scripts( $hook ) {
 		// register scripts and styles
 		wp_register_style( 'cshp-wm-stylesheet', CSHP_WM_URL . 'assets/css/widget-menuizer.css', null, $this->version, false );
-		wp_register_style( 'cshp-wm-sidabar', CSHP_WM_URL . 'assets/css/sidebars.css', null, $this->version, false );
-		wp_register_script( 'cshp-wm-sidabar', CSHP_WM_URL . 'assets/js/sidebars.js', array( 'jquery' ), $this->version, true );
+		wp_register_style( 'cshp-wm-sidebar', CSHP_WM_URL . 'assets/css/sidebars.css', null, $this->version, false );
+		wp_register_script( 'cshp-wm-sidebar', CSHP_WM_URL . 'assets/js/sidebars.js', array( 'jquery' ), $this->version, true );
 		wp_localize_script(
-			'cshp-wm-sidabar', 'cshp_wm_sidebars_options', array(
+			'cshp-wm-sidebar', 'cshp_wm_sidebars_options', array(
 				'ajaxurl'       => admin_url( 'admin-ajax.php' ),
 				'cshp_wm_sidebars_nonce'    => wp_create_nonce( 'cshp_wm_sidebars_nonce' ),
 			)
@@ -92,8 +92,8 @@ class CSHP_Widget_Menuizer {
 		// Add scripts and style on the needed admin screen
 		switch ( $hook ) :
 			case 'widgets.php':
-				wp_enqueue_script( 'cshp-wm-sidabar' );
-				wp_enqueue_style( 'cshp-wm-sidabar' );
+				wp_enqueue_script( 'cshp-wm-sidebar' );
+				wp_enqueue_style( 'cshp-wm-sidebar' );
 				break;
 			case 'nav-menus.php':
 				wp_enqueue_style( 'menuizer_stylesheet' );
