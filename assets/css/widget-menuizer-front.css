@@ -1,0 +1,13 @@
+/* CSS Document */
+.menu-item.menu-item-has-children:hover .sub-menu { display: block; }
+.menu-item-type-sidebar { min-width: 320px; padding: 10px; max-width: 100%; }
+.menu-item-type-sidebar .menuizer-container .widget { width: 100%; position: relative;}
+.menu-item-type-sidebar .menuizer-container .widget ul { left: auto; margin: 0; top: auto; position: relative; display: block;}
+.menu-item-type-sidebar .menuizer-stack-vertical .widget { display: block;}
+.menu-item-type-sidebar .menuizer-stack-horizontal { width: 100%;}
+.menu-item-type-sidebar .menuizer-stack-horizontal .widget { display: inline-block; width: 33%; vertical-align: top; height: auto; padding: 0.5rem;}
+
+/* Small Devices, Tablets */
+@media only screen and (min-width : 768px) {
+	.menu-item-type-sidebar .menuizer-stack-horizontal { width: 50vw;}
+}

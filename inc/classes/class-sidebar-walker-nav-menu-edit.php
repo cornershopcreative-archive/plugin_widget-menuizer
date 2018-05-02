@@ -218,6 +218,28 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 					</label>
 				</p>
 				<?php endif; ?>
+				<?php if ( 'sidebar' === $item->type ) : ?>
+				<p class="field-stack-direction description description-wide">
+					<label for="edit-menu-item-stack-direction-<?php echo esc_attr( $item_id ); ?>">
+							<?php /* phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain */ esc_html_e( 'Stack Direction', CSHP_WM_TEXTDOMAIN ); ?><br />
+							<select id="edit-menu-item-stack-direction-<?php echo esc_attr( $item_id ); ?>" class="widefat" name="menu-item-stack-direction[<?php echo esc_attr( $item_id ); ?>]" >
+							<?php
+							$elements = array(
+								/* phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain */
+								'vertical' => __( 'Vertical', CSHP_WM_TEXTDOMAIN ),
+								/* phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain */
+								'horizontal' => __( 'Horizontal', CSHP_WM_TEXTDOMAIN ),
+							);
+							foreach ( $elements as $value => $label ) :
+							?>
+								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $item->stack_direction, $value ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php
+							endforeach;
+							?>
+							</select>
+					</label>
+				</p>
+				<?php endif; ?>
 				<p class="field-description description description-wide">
 					<label for="edit-menu-item-description-<?php echo esc_attr( $item_id ); ?>">
 						<?php esc_html_e( 'Description' ); ?><br />

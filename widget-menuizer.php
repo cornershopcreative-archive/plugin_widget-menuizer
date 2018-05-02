@@ -3,7 +3,7 @@
 Plugin Name: Widget Menuizer
 Plugin URI: http://cornershopcreative.com/code/widget-menuizer
 Description: Embed sidebar regions in your WordPress navigation menus.
-Version: 0.7
+Version: 1.0
 Author: Cornershop Creative
 Author URI: http://cornershopcreative.com
 License: GPLv2 or later
@@ -22,7 +22,7 @@ class CSHP_Widget_Menuizer {
 	 *
 	 * @var version
 	 */
-	protected $version = '0.7';
+	protected $version = '1.0';
 
 	/**
 	 * Setting up our class.
@@ -37,9 +37,12 @@ class CSHP_Widget_Menuizer {
 		$this->load_dependencies();
 
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'wp_enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_scripts' ) );
 		add_filter( 'wp_edit_nav_menu_walker', array( &$this, 'override_edit_nav_menu_walker' ), 99 );
 		add_filter( 'walker_nav_menu_start_el', array( &$this, 'menuizer_nav_menu_start_el' ), 99, 4 );
+		add_action( 'wp_update_nav_menu_item', array( &$this, 'wp_update_nav_menu_item' ), 10, 2 );
+		add_filter( 'wp_setup_nav_menu_item', array( &$this, 'wp_setup_nav_menu_item' ), 10, 1 );
 		add_action( 'wp_ajax_cshp_wm_add_widget_area', array( &$this, 'add_widget_area' ) );
 		add_action( 'wp_ajax_cshp_wm_remove_widget_area', array( &$this, 'remove_widget_area' ) );
 		add_action( 'widgets_init', array( &$this, 'widgets_init' ) );
@@ -51,6 +54,15 @@ class CSHP_Widget_Menuizer {
 	 */
 	private function load_dependencies() {
 		$this->require_all( __DIR__ . DIRECTORY_SEPARATOR . 'inc' );
+
+		$this->build_menu_settings();
+	}
+
+	/**
+	 * Build the admin page.
+	 */
+	private function build_menu_settings() {
+		require_once( CSHP_WM_PATH . 'views/admin/menu-settings.php' );
 	}
 
 	/**
@@ -68,10 +80,10 @@ class CSHP_Widget_Menuizer {
 	public function admin_enqueue_scripts( $hook ) {
 		// register scripts and styles
 		wp_register_style( 'cshp-wm-stylesheet', CSHP_WM_URL . 'assets/css/widget-menuizer.css', null, $this->version, false );
-		wp_register_style( 'cshp-wm-sidabar', CSHP_WM_URL . 'assets/css/sidebars.css', null, $this->version, false );
-		wp_register_script( 'cshp-wm-sidabar', CSHP_WM_URL . '/assets/js/sidebars.js', array( 'jquery' ), $this->version, true );
+		wp_register_style( 'cshp-wm-sidebar', CSHP_WM_URL . 'assets/css/sidebars.css', null, $this->version, false );
+		wp_register_script( 'cshp-wm-sidebar', CSHP_WM_URL . 'assets/js/sidebars.js', array( 'jquery' ), $this->version, true );
 		wp_localize_script(
-			'cshp-wm-sidabar', 'cshp_wm_sidebars_options', array(
+			'cshp-wm-sidebar', 'cshp_wm_sidebars_options', array(
 				'ajaxurl'       => admin_url( 'admin-ajax.php' ),
 				'cshp_wm_sidebars_nonce'    => wp_create_nonce( 'cshp_wm_sidebars_nonce' ),
 			)
@@ -80,12 +92,31 @@ class CSHP_Widget_Menuizer {
 		// Add scripts and style on the needed admin screen
 		switch ( $hook ) :
 			case 'widgets.php':
-				wp_enqueue_script( 'cshp-wm-sidabar' );
-				wp_enqueue_style( 'cshp-wm-sidabar' );
+				wp_enqueue_script( 'cshp-wm-sidebar' );
+				wp_enqueue_style( 'cshp-wm-sidebar' );
 				break;
 			case 'nav-menus.php':
 				wp_enqueue_style( 'menuizer_stylesheet' );
 		endswitch;
+	}
+
+	/**
+	 * Register and enqueue scripts for front end.
+	 */
+	public function wp_enqueue_scripts( $hook ) {
+		// bail if admin.
+		if ( is_admin() ) {
+			return;
+		}
+
+		// register our front stylesheet.
+		wp_register_style( 'cshp-wm-front', CSHP_WM_URL . 'assets/css/widget-menuizer-front.css', null, $this->version, false );
+
+		// if widget_menuizer_dropdown_settings_show_on_hover is set to on then proceed.
+		if ( 'on' === get_option( 'widget_menuizer_dropdown_settings_show_on_hover' ) ) {
+			// enqueue stylesheet.
+			wp_enqueue_style( 'cshp-wm-front' );
+		}
 	}
 
 	/**
@@ -220,6 +251,11 @@ class CSHP_Widget_Menuizer {
 					$classes[] = $class;
 				}
 			}
+
+			if ( isset( $item->stack_direction ) ) {
+				$classes[] = 'menuizer-stack-' . $item->stack_direction;
+			}
+
 			$classes = implode( ' ', $classes );
 
 			// wrap
@@ -241,6 +277,36 @@ class CSHP_Widget_Menuizer {
 		}//end if
 
 		return $item_output;
+	}
+
+	/**
+	 * Saves new field to postmeta for navigation.
+	 *
+	 * @param int $menu_id         the id of the menu.
+	 * @param int $menu_item_db_id the id of the menu item.
+	 */
+	function wp_update_nav_menu_item( $menu_id, $menu_item_db_id ) {
+		// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( ! empty( $_REQUEST['menu-item-stack-direction'] ) && is_array( $_REQUEST['menu-item-stack-direction'] ) && isset( $_REQUEST['menu-item-stack-direction'][ $menu_item_db_id ] ) ) {
+			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			$stack_direction = ! empty( $_REQUEST['menu-item-stack-direction'][ $menu_item_db_id ] ) ? $_REQUEST['menu-item-stack-direction'][ $menu_item_db_id ] : '';
+			update_post_meta( $menu_item_db_id, '_menu_item_stack_direction', $stack_direction );
+		}
+	}
+
+	/**
+	 * Adds value of new field to $item object that will be passed to Walker_Nav_Menu_Edit.
+	 *
+	 * @param object $menu_item the menu item object.
+	 *
+	 * @return array $menu_item the menu item object.
+	 */
+	function wp_setup_nav_menu_item( $menu_item ) {
+		if ( isset( $menu_item->ID ) ) :
+			$menu_item->stack_direction = get_post_meta( $menu_item->ID, '_menu_item_stack_direction', true );
+		endif;
+
+		return $menu_item;
 	}
 
 	/**
