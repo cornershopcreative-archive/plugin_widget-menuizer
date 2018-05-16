@@ -7,12 +7,12 @@ Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Unlock the full potential of the WordPress menu system and add your theme's sidebar regions and widgets to your menus.
+Unlock the full potential of the WordPress menu system to create mega menus and more by adding sidebar regions and widgets to your menus.
 
 
 == Description ==
 
-Anything you can do with a widget can now be done inside your menus! 
+Anything you can do with a widget can now be done inside your menus!
 
 Widget Menuizer makes WordPress menus even more powerful, allowing for easy creation of custom “mega menus” and other fanciness without completely overhauling the menu management system into something unrecognizable.
 
@@ -20,12 +20,13 @@ Upon activation, navigate to the menu management screen under *Appearance > Menu
 
 Once in your menu, you'll see a new option for "Container Element," which specifies which HTML tag is wrapped around the sidebars that are output into the menu.
 
+While running Widget Menuizer you also get the ability to define new sidebar regions right from the *Appearance > Widgets* admin screen, so you can easily create new regions just for including in your menus without having to write any custom code for your theme.
+
 **Important:** Because it's possible to put menu widgets inside sidebars, you may see a warning notice if the sidebar region you've put in your menu contains a menu widget. This is because you may have inadvertently created a recursion: if the menu contained in your sidebar is the same menu your sidebar is placed in, you'll have an infinite loop that will do bad, bad things. So be careful.
 
+**New in 1.0** Widget Menuizer now gives site administrators the ability to control the direction widgets flow within the menu, either horizontally or vertically.
+
 **New in 0.6:** Widget Menuizer now provides a way for site administrators to create new Sidebars on the fly from the Widget admin! Now you can create new sidebars for use in your menus without having to edit your theme files or use some other plugin to let you register new sidebars.
-
-**New in 1.0** Widget Menuizer now provides a way for site administrators to control the direction the widgets stack either horizontally or vertically.
-
 
 == Installation ==
 
@@ -61,11 +62,11 @@ In the upper right corner of your window, click on 'Screen Options' and make sur
 
 = How can I create a sidebar specifically for use in a menu that doesn't appear elsewhere in my theme? All my theme's sidebars are used elsewhere. =
 
-Now with version 0.6 of Widget Menuizer, when you go to *Appearance > Widgets*, you have the option to "Add a New Sidebar." Use the form to create as many new sidebar regions as you want, which you can then insert into your menus like any other sidebars.
+Now with version 0.6 of Widget Menuizer, when you go to *Appearance > Widgets*, you have the option to "Add a New Sidebar." Use the form to create as many new sidebar regions as you want, which you can then insert into your menus like any other sidebars. These sidebars you create won't appear elsewhere on your site, so they're ideal for populating custom menus.
 
 = How can I make my child menu items show on hover? =
 
-Since version 1.0+ in the WordPress admin go to Settings > Widget Menuizer and check the “Show on Hover?” option.
+If your theme doesn't natively support showing child menu items on hover, we've got you covered! Starting with version 1.0, in the WordPress admin you can go to Settings > Widget Menuizer and check the “Show on Hover?” option.
 
 == Screenshots ==
 
@@ -77,9 +78,9 @@ Since version 1.0+ in the WordPress admin go to Settings > Widget Menuizer and c
 == Changelog ==
 
 = 1.0 =
-* OOP refactoring of the whole code base.
-* Admin Settings page under Settings > Widget Menuizer.
-* Horizontal/Vertical menu item control.
+* OOP refactoring of the whole codebase.
+* Introduced Admin Settings page under Settings > Widget Menuizer.
+* Added horizontal/vertical widget arrangement control.
 
 = 0.6 =
 * Introduced a new feature letting site administrators create new Sidebars from the widgets admin
