@@ -219,9 +219,9 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 				</p>
 				<?php endif; ?>
 				<?php if ( 'sidebar' === $item->type ) : ?>
-				<p class="field-stack-direction description description-wide">
+				<p class="field-stack-direction description description-thin">
 					<label for="edit-menu-item-stack-direction-<?php echo esc_attr( $item_id ); ?>">
-							<?php /* phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain */ esc_html_e( 'Stack Direction', CSHP_WM_TEXTDOMAIN ); ?><br />
+							<?php /* phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain */ esc_html_e( 'Widget Layout', CSHP_WM_TEXTDOMAIN ); ?><br />
 							<select id="edit-menu-item-stack-direction-<?php echo esc_attr( $item_id ); ?>" class="widefat" name="menu-item-stack-direction[<?php echo esc_attr( $item_id ); ?>]" >
 							<?php
 							$elements = array(
