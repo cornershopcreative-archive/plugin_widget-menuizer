@@ -113,7 +113,7 @@ class CSHP_Widget_Menuizer {
 		wp_register_style( 'cshp-wm-front', CSHP_WM_URL . 'assets/css/widget-menuizer-front.css', null, $this->version, false );
 
 		// if widget_menuizer_dropdown_settings_show_on_hover is set to on then proceed.
-		if ( 'on' === get_option( 'widget_menuizer_dropdown_settings_show_on_hover' ) ) {
+		if ( (bool) get_option( 'widget_menuizer_dropdown_settings_show_on_hover' ) ) {
 			// enqueue stylesheet.
 			wp_enqueue_style( 'cshp-wm-front' );
 		}
