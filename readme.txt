@@ -2,7 +2,7 @@
 Contributors: drywallbmb
 Tags: menus, widgets, sidebars
 Requires at least: 3.9.2
-Tested up to: 4.9.5
+Tested up to: 5.0.3
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -76,6 +76,9 @@ If your theme doesn't natively support showing child menu items on hover, we've 
 4. Options for the HTML5 element used to contain the sidebar region. What you choose here depends on your theme and CSS; you will probably want to set this to whatever wrapper element the sidebar is usually displayed within for optimal appearance. Regardless, you'll probably need to add some CSS to get it looking exactly how you want.
 
 == Changelog ==
+
+= 1.0.1 =
+* Bugfix: Checking existence of classes before defining them to avoid potential (but rare) fatal error.
 
 = 1.0 =
 * OOP refactoring of the whole codebase.
