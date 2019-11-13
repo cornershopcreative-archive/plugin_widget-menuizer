@@ -2,7 +2,7 @@
 Contributors: drywallbmb
 Tags: menus, widgets, sidebars
 Requires at least: 3.9.2
-Tested up to: 5.0.3
+Tested up to: 5.3
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
