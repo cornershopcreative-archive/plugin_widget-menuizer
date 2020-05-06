@@ -252,7 +252,21 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 						<span class="description"><?php esc_html_e( 'The description will be displayed in the menu if the current theme supports it.' ); ?></span>
 					</label>
 				</p>
-
+				<?php
+				/**
+				 * WP core function added in 5.4 to display custom fields on menu items.
+				 * Including it here as a pre 5.4 compatibility with other plugins 
+				 * and due to the nature of how Widget Menuizer works.
+				 * Fires just before the move buttons of a nav menu item in the menu editor.
+				 *
+				 * @param int      $item_id Menu item ID.
+				 * @param WP_Post  $item    Menu item data object.
+				 * @param int      $depth   Depth of menu item. Used for padding.
+				 * @param stdClass $args    An object of menu item arguments.
+				 * @param int      $id      Nav menu ID.
+				 */
+				do_action( 'wp_nav_menu_item_custom_fields', $item_id, $item, $depth, $args, $id );
+				?>
 				<p class="field-move hide-if-no-js description description-wide">
 					<label>
 						<span><?php esc_html_e( 'Move' ); ?></span>
