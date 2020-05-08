@@ -179,8 +179,8 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 								// phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
 								'outside' => __( 'Outside container', CSHP_WM_TEXTDOMAIN ),
 							);
-						foreach ( $options as $value => $label ) :
-							?>
+							foreach ( $options as $value => $label ) :
+								?>
 								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $item->attr_title, $value ); ?>><?php echo esc_html( $label ); ?></option>
 							<?php endforeach; ?>
 						</select>
@@ -231,9 +231,9 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 								'horizontal' => __( 'Horizontal', CSHP_WM_TEXTDOMAIN ),
 							);
 							foreach ( $elements as $value => $label ) :
-							?>
+								?>
 								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $item->stack_direction, $value ); ?>><?php echo esc_html( $label ); ?></option>
-							<?php
+								<?php
 							endforeach;
 							?>
 							</select>
@@ -252,7 +252,21 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 						<span class="description"><?php esc_html_e( 'The description will be displayed in the menu if the current theme supports it.' ); ?></span>
 					</label>
 				</p>
-
+				<?php
+				/**
+				 * WP core function added in 5.4 to display custom fields on menu items.
+				 * Including it here as a pre 5.4 compatibility with other plugins
+				 * and due to the nature of how Widget Menuizer works.
+				 * Fires just before the move buttons of a nav menu item in the menu editor.
+				 *
+				 * @param int      $item_id Menu item ID.
+				 * @param WP_Post  $item    Menu item data object.
+				 * @param int      $depth   Depth of menu item. Used for padding.
+				 * @param stdClass $args    An object of menu item arguments.
+				 * @param int      $id      Nav menu ID.
+				 */
+				do_action( 'wp_nav_menu_item_custom_fields', $item_id, $item, $depth, $args, $id );
+				?>
 				<p class="field-move hide-if-no-js description description-wide">
 					<label>
 						<span><?php esc_html_e( 'Move' ); ?></span>
@@ -273,13 +287,13 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 								/* phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain, WordPress.XSS.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.MissingTranslatorsComment */
 								__( 'Sidebar Shown: %s', CSHP_WM_TEXTDOMAIN ), '<a href="' . esc_url( admin_url( 'widgets.php' ) ) . '">' . esc_html( $original_title ) . '</a>'
 							);
-								?>
+							?>
 						</p>
 						<?php
 
 						// flag invalid reasons
 						if ( ! empty( $item->_invalid ) ) :
-						?>
+							?>
 							<p class="warning invalid">
 								<?php echo esc_html( $item->_invalid ); ?>
 							</p>
@@ -296,7 +310,7 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 							}
 						}
 						if ( $found_menu ) :
-						?>
+							?>
 							<p class="warning recursion">
 								<?php esc_html_e( 'This sidebar contains a menu widget! Please ensure the widget doesn’t contain this menu or an infinite loop will result.' ); ?>
 							</p>
@@ -325,7 +339,7 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 																								), 'delete-menu_item_' . $item_id
 																							)
 																						);
-																					?>
+																						?>
 					"><?php esc_html_e( 'Remove' ); ?></a> <span class="meta-sep hide-if-no-js"> | </span> <a class="item-cancel submitcancel hide-if-no-js" id="cancel-<?php echo esc_attr( $item_id ); ?>" href="
 					<?php
 					echo esc_url(
@@ -336,7 +350,7 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 							), admin_url( 'nav-menus.php' )
 						)
 					);
-						?>
+					?>
 						#menu-item-settings-<?php echo esc_attr( $item_id ); ?>"><?php esc_html_e( 'Cancel' ); ?></a>
 				</div>
 
