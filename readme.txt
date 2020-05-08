@@ -78,7 +78,7 @@ If your theme doesn't natively support showing child menu items on hover, we've 
 == Changelog ==
 
 = 1.1.0 =
-* Fixed a conflict with the Advanced Custom Fields plugin that caused fields added to menu items not to appear when editing menus.
+* Fixed a conflict with the Advanced Custom Fields plugin that caused fields added to menu items not to appear on the Appearance > Menus screen.
 
 = 1.0.1 =
 * Bugfix: Checking existence of classes before defining them to avoid potential (but rare) fatal error.
