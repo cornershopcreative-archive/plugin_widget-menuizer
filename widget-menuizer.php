@@ -320,6 +320,11 @@ class CSHP_Widget_Menuizer {
 		}
 		// get sidebars wp option.
 		$cshp_sidebars = get_option( 'cshp_wm_widget_areas' );
+		if ( empty( $cshp_sidebars ) ) {
+			$cshp_sidebars = array(
+				'areas' => array(),
+			);
+		}
 		// get widget area name
 		$widget_area_name = sanitize_text_field( $_POST['cshp_wm_widget_area_name'] );
 		// create the slug part
@@ -371,6 +376,10 @@ class CSHP_Widget_Menuizer {
 		$widget_area_name = $_POST['cshp_wm_widget_area_name'];
 		// get sidebars wp option.
 		$cshp_sidebars = get_option( 'cshp_wm_widget_areas' );
+		// if there aren't any widget areas, there's nothing left to do here
+		if ( empty( $cshp_sidebars ) || empty( $cshp_sidebars['areas'] ) || ! isset( $cshp_sidebars['areas'][ $widget_area_name ] ) ) {
+			die();
+		}
 		// unset the sidebar from the array
 		unset( $cshp_sidebars['areas'][ $widget_area_name ] );
 		// update the sidebars wp option
@@ -394,7 +403,7 @@ class CSHP_Widget_Menuizer {
 		// get sidebars wp option.
 		$cshp_sidebars = get_option( 'cshp_wm_widget_areas' );
 		// check that there are sidebars to register.
-		if ( $cshp_sidebars['areas'] ) :
+		if ( ! empty( $cshp_sidebars ) && ! empty( $cshp_sidebars['areas'] ) ) :
 			// loop through sidebars.
 			foreach ( $cshp_sidebars['areas'] as $id => $sidebar ) :
 				// register each sidebar.
