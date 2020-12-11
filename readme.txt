@@ -77,6 +77,9 @@ If your theme doesn't natively support showing child menu items on hover, we've 
 
 == Changelog ==
 
+= 1.1.1 =
+* Fixed a bug that caused the Sidebars option not to appear on the Appearance > Menus screen.
+
 = 1.1.0 =
 * Fixed a conflict with the Advanced Custom Fields plugin that caused fields added to menu items not to appear on the Appearance > Menus screen.
 
