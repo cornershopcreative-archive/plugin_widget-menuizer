@@ -22,7 +22,7 @@ Once in your menu, you'll see a new option for "Container Element," which specif
 
 While running Widget Menuizer you also get the ability to define new sidebar regions right from the *Appearance > Widgets* admin screen, so you can easily create new regions just for including in your menus without having to write any custom code for your theme.
 
-Note for users of WordPress 5.8 and above: This plugin still works for injecting regions into menus, but you need to run the "Classic Widgets" plugin in order to create new Widget Areas on-the-fly.
+Note for users of WordPress 5.8 and above: This plugin still works for injecting regions into menus, but you need to run the "Classic Widgets" plugin in order to create new Widget Areas via the admin.
 
 **Important:** Because it's possible to put menu widgets inside sidebars, you may see a warning notice if the sidebar region you've put in your menu contains a menu widget. This is because you may have inadvertently created a recursion: if the menu contained in your sidebar is the same menu your sidebar is placed in, you'll have an infinite loop that will do bad, bad things. So be careful.
 
