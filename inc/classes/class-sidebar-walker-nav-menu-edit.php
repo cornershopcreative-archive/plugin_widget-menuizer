@@ -302,19 +302,23 @@ class Sidebar_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 						<?php
 						// if necessary, flag for potential recursion
 						$current_widgets = get_option( 'sidebars_widgets' );
-						$found_menu = false;
-						foreach ( $current_widgets[ $item->xfn ] as $widget_type ) {
-							if ( strpos( $widget_type, 'nav_menu' ) === 0 ) {
-								$found_menu = true;
-								break;
+						if ( ! empty( $current_widgets ) && ! empty( $current_widgets[ $item->xfn ] ) ) :
+							$found_menu = false;
+							foreach ( $current_widgets[ $item->xfn ] as $widget_type ) {
+								if ( strpos( $widget_type, 'nav_menu' ) === 0 ) {
+									$found_menu = true;
+									break;
+								}
 							}
-						}
-						if ( $found_menu ) :
-							?>
-							<p class="warning recursion">
-								<?php esc_html_e( 'This sidebar contains a menu widget! Please ensure the widget doesn’t contain this menu or an infinite loop will result.' ); ?>
-							</p>
-						<?php endif; ?>
+							if ( $found_menu ) :
+								?>
+								<p class="warning recursion">
+									<?php esc_html_e( 'This sidebar contains a menu widget! Please ensure the widget doesn’t contain this menu or an infinite loop will result.' ); ?>
+								</p>
+								<?php
+							endif;
+						endif;
+						?>
 					<?php elseif ( 'custom' !== $item->type && false !== $original_title ) : ?>
 						<p class="link-to-original">
 							<?php
