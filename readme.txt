@@ -2,7 +2,7 @@
 Contributors: drywallbmb
 Tags: menus, widgets, sidebars
 Requires at least: 3.9.2
-Tested up to: 5.6
+Tested up to: 5.8
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -21,6 +21,8 @@ Upon activation, navigate to the menu management screen under *Appearance > Menu
 Once in your menu, you'll see a new option for "Container Element," which specifies which HTML tag is wrapped around the sidebars that are output into the menu.
 
 While running Widget Menuizer you also get the ability to define new sidebar regions right from the *Appearance > Widgets* admin screen, so you can easily create new regions just for including in your menus without having to write any custom code for your theme.
+
+Note for users of WordPress 5.8 and above: This plugin still works for injecting regions into menus, but you need to run the "Classic Widgets" plugin in order to create new Widget Areas on-the-fly.
 
 **Important:** Because it's possible to put menu widgets inside sidebars, you may see a warning notice if the sidebar region you've put in your menu contains a menu widget. This is because you may have inadvertently created a recursion: if the menu contained in your sidebar is the same menu your sidebar is placed in, you'll have an infinite loop that will do bad, bad things. So be careful.
 
